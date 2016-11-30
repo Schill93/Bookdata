@@ -24,93 +24,180 @@ for line in file:
     ISBNList.append(line)
 file.close()
 
-print(ISBNList)
 
 
-def bokus():
-
-    print('bokus')
+def bokus(isbn):
 
     link='http://www.bokus.com/bok/'
 
-    for x in range (0,2):
-        try:
-            response = urllib2.urlopen(link + ISBNList[x])
 
-            html = response.read()
-            # So we can handle it as string
-            response.close()
+    try:
+        response = urllib2.urlopen(link + isbn)
 
-        except:
-            conn = False
-            log("No connection to website. Trying to reconnect in 10 seconds.")
-            sleep(10)
+        html = response.read()
+        # So we can handle it as string
+        response.close()
 
+    except:
+        conn = False
+        log("No connection to website. Trying to reconnect in 10 seconds.")
+        sleep(10)
+
+    try:
         soup = BS(html, 'lxml')
 
         buyValue = soup.find('span', {'class': 'pris big'}).text
         buyValue = buyValue[:-2]
-        print(buyValue)
+    except:
+        buyValue = 'null'
+        buyValue = str(buyValue)
 
-        sleep(1)
+    return buyValue
 
-def adlibris():
-    print('adlibris')
+
+def adlibris(isbn):
+
 
     link = 'http://www.adlibris.com/se/sok?q='
 
-    for x in range(0, 2):
-        try:
-            response = urllib2.urlopen(link + ISBNList[x])
 
-            html = response.read()
-            # So we can handle it as string
-            response.close()
+    try:
+        response = urllib2.urlopen(link + isbn)
 
-        except:
-            conn = False
-            log("No connection to website. Trying to reconnect in 10 seconds.")
-            sleep(10)
+        html = response.read()
+        # So we can handle it as string
+        response.close()
+
+    except:
+        conn = False
+        log("No connection to website. Trying to reconnect in 10 seconds.")
+        leep(10)
+
+    try:
 
         soup = BS(html, 'lxml')
 
         buyValue = soup.find('div', {'class': 'current-price'}).text
         buyValue = buyValue[:-2]
-        print(buyValue)
+    except:
+        buyValue = 'null'
+        buyValue = str(buyValue)
 
-def snaplit():
-    print('snaplit')
+    return  buyValue
+
+def snaplit(isbn):
+
 
     link = 'http://www.snaplit.com/?s='
 
-    for x in range(0, 2):
-        try:
-            response = urllib2.urlopen(link + ISBNList[x])
+
+    try:
+        response = urllib2.urlopen(link + isbn)
 
 
-            html = response.read()
-            # So we can handle it as string
-            response.close()
+        html = response.read()
+        # So we can handle it as string
+        response.close()
 
-        except:
-            conn = False
-            log("No connection to website. Trying to reconnect in 10 seconds.")
-            sleep(10)
+    except:
+        conn = False
+        sleep(10)
 
+
+    try:
         soup = BS(html, 'lxml')
 
         buyValue = soup.find('span', {'class': "woocommerce-Price-amount amount"}).text
         buyValue = buyValue[:-2]
-        print(buyValue)
+    except:
+        buyValue='null'
+        buyValue=str(buyValue)
+
+    return buyValue
+
+
+
+def cdon(isbn):
+
+    link = 'http://cdon.se/search?q='
+
+
+    try:
+        response = urllib2.urlopen(link + isbn)
+
+
+        html = response.read()
+        # So we can handle it as string
+        response.close()
+
+    except:
+        conn = False
+        log("No connection to website. Trying to reconnect in 10 seconds.")
+        sleep(10)
+
+    try:
+
+        soup = BS(html, 'lxml')
+
+        error= soup.findAll('div', {'class': "support-message-wrapper"})
+
+        buyValue = soup.findAll('div', {'class': "price"})
+
+
+
+        price = str(int(re.search(r'\d+', str(buyValue[-1])).group()))
+    except:
+        price = 'null'
+        price = str(price)
+
+    if   error:
+        price = 'null'
+        price = str(price)
+
+
+    return price
+
+def db_create():
+    db = pymysql.connect(host='95.80.53.172', port=3306, user='stockmod', passwd='stockmod', db='Bookprice')
+    cursor = db.cursor()
+
+
+
+
+    for isbn in ISBNList:
+
+        try:
+            sql = "CREATE TABLE `" + isbn.rstrip() + "` (bokus double, adlibris double, cdon double, snaplit double);"
+            cursor.execute(sql)
+            db.commit()
+        except:
+            print(isbn.rstrip() + " already exists")
+
+        else:
+            print(isbn.rstrip() + " created")
+
+    db.close()
 
 
 def main():
-    bokus()
-    adlibris()
-    #cdon()
-    snaplit()
+
+    db_create()
+
+    db = pymysql.connect(host='95.80.53.172', port=3306, user='stockmod', passwd='stockmod', db='Bookprice')
+    cursor = db.cursor()
+
+    for isbn in ISBNList:
 
 
+
+
+        sql = "INSERT INTO `" + isbn.rstrip() + "` (bokus, adlibris, cdon, snaplit) VALUES (" + bokus(isbn) + ","+ adlibris(isbn) + "," + cdon(isbn) + "," + snaplit(isbn) + ");"
+        print(sql)
+        cursor.execute(sql)
+        db.commit()
+
+
+    db.close()
 
 if __name__ == "__main__":
     main()
