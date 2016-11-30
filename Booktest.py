@@ -29,6 +29,8 @@ print(ISBNList)
 
 def bokus():
 
+    print('bokus')
+
     link='http://www.bokus.com/bok/'
 
     for x in range (0,2):
@@ -50,18 +52,64 @@ def bokus():
         buyValue = buyValue[:-2]
         print(buyValue)
 
-        sleep(4)
+        sleep(1)
+
+def adlibris():
+    print('adlibris')
+
+    link = 'http://www.adlibris.com/se/sok?q='
+
+    for x in range(0, 2):
+        try:
+            response = urllib2.urlopen(link + ISBNList[x])
+
+            html = response.read()
+            # So we can handle it as string
+            response.close()
+
+        except:
+            conn = False
+            log("No connection to website. Trying to reconnect in 10 seconds.")
+            sleep(10)
+
+        soup = BS(html, 'lxml')
+
+        buyValue = soup.find('div', {'class': 'current-price'}).text
+        buyValue = buyValue[:-2]
+        print(buyValue)
+
+def snaplit():
+    print('snaplit')
+
+    link = 'http://www.snaplit.com/?s='
+
+    for x in range(0, 2):
+        try:
+            response = urllib2.urlopen(link + ISBNList[x])
 
 
+            html = response.read()
+            # So we can handle it as string
+            response.close()
 
+        except:
+            conn = False
+            log("No connection to website. Trying to reconnect in 10 seconds.")
+            sleep(10)
 
+        soup = BS(html, 'lxml')
 
-
-
+        buyValue = soup.find('span', {'class': "woocommerce-Price-amount amount"}).text
+        buyValue = buyValue[:-2]
+        print(buyValue)
 
 
 def main():
     bokus()
+    adlibris()
+    #cdon()
+    snaplit()
+
 
 
 if __name__ == "__main__":
