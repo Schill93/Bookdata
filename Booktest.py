@@ -167,7 +167,7 @@ def db_create():
     for isbn in ISBNList:
 
         try:
-            sql = "CREATE TABLE `" + isbn.rstrip() + "` (bokus double, adlibris double, cdon double, snaplit double);"
+            sql = "CREATE TABLE `" + isbn.rstrip() + "` (date date, bokus double, adlibris double, cdon double, snaplit double);"
             cursor.execute(sql)
             db.commit()
         except:
@@ -191,7 +191,7 @@ def main():
 
 
 
-        sql = "INSERT INTO `" + isbn.rstrip() + "` (bokus, adlibris, cdon, snaplit) VALUES (" + bokus(isbn) + ","+ adlibris(isbn) + "," + cdon(isbn) + "," + snaplit(isbn) + ");"
+        sql = "INSERT INTO `" + isbn.rstrip() + "` (date, bokus, adlibris, cdon, snaplit) VALUES (CURDATE()," + bokus(isbn) + ","+ adlibris(isbn) + "," + cdon(isbn) + "," + snaplit(isbn) + ");"
         print(sql)
         cursor.execute(sql)
         db.commit()
