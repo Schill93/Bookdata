@@ -24,6 +24,9 @@ for line in file:
     ISBNList.append(line)
 file.close()
 
+end = datetime.time(12, 00, 00)
+start = datetime.time(11, 00, 00)
+
 
 
 def bokus(isbn):
@@ -179,25 +182,40 @@ def db_create():
     db.close()
 
 
-def main():
+def planner():
 
-    db_create()
 
     db = pymysql.connect(host='95.80.53.172', port=3306, user='stockmod', passwd='stockmod', db='Bookprice')
     cursor = db.cursor()
 
     for isbn in ISBNList:
-
-
-
-
-        sql = "INSERT INTO `" + isbn.rstrip() + "` (date, bokus, adlibris, cdon, snaplit) VALUES (CURDATE()," + bokus(isbn) + ","+ adlibris(isbn) + "," + cdon(isbn) + "," + snaplit(isbn) + ");"
+        sql = "INSERT INTO `" + isbn.rstrip() + "` (date, bokus, adlibris, cdon, snaplit) VALUES (CURDATE()," + bokus(
+            isbn) + "," + adlibris(isbn) + "," + cdon(isbn) + "," + snaplit(isbn) + ");"
         print(sql)
         cursor.execute(sql)
         db.commit()
 
 
-    db.close()
+def main():
+
+    mydate = datetime.datetime.today()
+    now = datetime.time(mydate.hour, mydate.minute, mydate.second)
+    #now=datetime.time(11,15,00)
+
+    db_create()
+
+    while True:
+
+        if start < now and now < end:
+            planner()
+            sleep(3600)
+
+        else:
+            print('Going to sleep')
+            sleep(1800)
+
+
+    
 
 if __name__ == "__main__":
     main()
