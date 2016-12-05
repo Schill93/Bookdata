@@ -24,6 +24,11 @@ for line in file:
     ISBNList.append(line)
 file.close()
 
+passFile = open('passwd.txt', 'r')
+
+password = passFile.read()
+password = password.replace("\n","")
+
 end = datetime.time(12, 00, 00)
 start = datetime.time(11, 00, 00)
 
@@ -161,7 +166,7 @@ def cdon(isbn):
     return price
 
 def db_create():
-    db = pymysql.connect(host='95.80.53.172', port=3306, user='stockmod', passwd='stockmod', db='Bookprice')
+    db = pymysql.connect(host='95.80.53.172', port=3306, user='stockmod', passwd=password, db='Bookprice')
     cursor = db.cursor()
 
 
@@ -185,7 +190,7 @@ def db_create():
 def planner():
 
 
-    db = pymysql.connect(host='95.80.53.172', port=3306, user='stockmod', passwd='stockmod', db='Bookprice')
+    db = pymysql.connect(host='95.80.53.172', port=3306, user='stockmod', passwd=password, db='Bookprice')
     cursor = db.cursor()
 
     for isbn in ISBNList:
@@ -204,6 +209,7 @@ def main():
 
     db_create()
 
+
     while True:
 
         if start < now and now < end:
@@ -215,7 +221,7 @@ def main():
             sleep(1800)
 
 
-    
+
 
 if __name__ == "__main__":
     main()
