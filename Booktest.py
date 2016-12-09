@@ -166,10 +166,17 @@ def cdon(isbn):
     return price
 
 def db_create():
-    db = pymysql.connect(host='95.80.53.172', port=3306, user='stockmod', passwd=password, db='Bookprice')
-    cursor = db.cursor()
 
+    conn = False
 
+    while (conn == False):
+        try:
+            db = pymysql.connect(host='95.80.53.172', port=3306, user='stockmod', passwd=password, db='Bookprice')
+            cursor = db.cursor()
+            conn = True
+        except:
+            conn = False
+            sleep(10)
 
 
     for isbn in ISBNList:
@@ -179,8 +186,8 @@ def db_create():
             cursor.execute(sql)
             db.commit()
         except:
-            print(isbn.rstrip() + " already exists")
 
+                print(isbn.rstrip() + " already exists")
         else:
             print(isbn.rstrip() + " created")
 
@@ -188,10 +195,16 @@ def db_create():
 
 
 def planner():
+    conn = False
 
-
-    db = pymysql.connect(host='95.80.53.172', port=3306, user='stockmod', passwd=password, db='Bookprice')
-    cursor = db.cursor()
+    while (conn == False):
+        try:
+            db = pymysql.connect(host='95.80.53.172', port=3306, user='stockmod', passwd=password, db='Bookprice')
+            cursor = db.cursor()
+            conn = True
+        except:
+            conn = False
+            sleep(10)
 
     for isbn in ISBNList:
         sql = "INSERT INTO `" + isbn.rstrip() + "` (date, bokus, adlibris, cdon, snaplit) VALUES (CURDATE()," + bokus(
@@ -225,3 +238,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+exit(0)
