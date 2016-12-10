@@ -216,22 +216,24 @@ def planner():
 
 def main():
 
-    mydate = datetime.datetime.today()
-    now = datetime.time(mydate.hour, mydate.minute, mydate.second)
-    #now=datetime.time(11,15,00)
+
+
 
     db_create()
 
 
     while True:
 
+        mydate = datetime.datetime.today()
+        now = datetime.time(mydate.hour, mydate.minute, mydate.second)
+
         if start < now and now < end:
             planner()
-            sleep(3600)
+            sleep(4000)
 
         else:
             print('Going to sleep')
-            sleep(1800)
+            sleep(600)
 
 
 
