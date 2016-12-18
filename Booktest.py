@@ -186,9 +186,10 @@ def db_create():
     for isbn in ISBNList:
 
         try:
-            sql = "CREATE TABLE `" + isbn.rstrip() + "` (date date, bokus double, adlibris double, cdon double, snaplit double);"
+            sql = "CREATE TABLE `" + isbn.rstrip() + "` (date date, bokus double, adlibris double, cdon double, snaplit double, PRIMARY KEY (date));"
             cursor.execute(sql)
             db.commit()
+
         except:
 
                 print(isbn.rstrip() + " already exists")
