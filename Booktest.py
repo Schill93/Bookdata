@@ -14,7 +14,10 @@ try:
 except ImportError:
     import urllib2
 
-
+outputFormat = 'db' # This is the standard mode in production
+if len(sys.argv) > 1:
+    if str(sys.argv[1]) == 'output=csv':
+        outputFormat = 'csv' # This is a debug mode, writing output to local file only once
 
 file = open('isbn.txt', 'r')
 
@@ -24,10 +27,11 @@ for line in file:
     ISBNList.append(line)
 file.close()
 
-passFile = open('passwd.txt', 'r')
+if outputFormat == 'db':
+    passFile = open('passwd.txt', 'r')
 
-password = passFile.read()
-password = password.replace("\n","")
+    password = passFile.read()
+    password = password.replace("\n","")
 
 end = datetime.time(12, 00, 00)
 start = datetime.time(11, 00, 00)
@@ -213,28 +217,45 @@ def planner():
         cursor.execute(sql)
         db.commit()
 
+def fetch_to_file(output_file_name):
+
+    rows = []
+    rows.append("ISBN,bokus,adlibris,cdon,snaplit\n")
+
+    for isbn in ISBNList:
+        row = isbn.rstrip() + "," + bokus(isbn) + "," + adlibris(isbn) + "," + cdon(isbn) + "," + snaplit(isbn) + "\n"
+        rows.append(row)
+        print("Fetched ", row[:-1])
+
+    print("Fetched data for " + str(len(rows)-1) + " books")
+
+    with open(output_file_name, 'w') as out_file:
+        out_file.writelines(rows)
+
+    print("Wrote data to " + output_file_name)
+
 
 def main():
 
+    if outputFormat == 'db':
+        db_create()
 
+        while True:
 
+            mydate = datetime.datetime.today()
+            now = datetime.time(mydate.hour, mydate.minute, mydate.second)
 
-    db_create()
+            if start < now and now < end:
+                planner()
+                sleep(4000)
 
-
-    while True:
-
-        mydate = datetime.datetime.today()
-        now = datetime.time(mydate.hour, mydate.minute, mydate.second)
-
-        if start < now and now < end:
-            planner()
-            sleep(4000)
-
-        else:
-            print('Going to sleep')
-            sleep(600)
-
+            else:
+                print('Going to sleep')
+                sleep(600)
+    elif outputFormat == 'csv':
+        output_file_name = str((datetime.datetime.today()).isoformat()) + '.csv'
+        output_file_path = "local_fetched_data/" # This directory has to exist beforehand
+        fetch_to_file(output_file_path + output_file_name)
 
 
 
