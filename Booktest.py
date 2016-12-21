@@ -33,8 +33,11 @@ if outputFormat == 'db':
     password = passFile.read()
     password = password.replace("\n","")
 
-end = datetime.time(12, 00, 00)
+
+#Defines interval when the fetch should occur.
 start = datetime.time(11, 00, 00)
+end = datetime.time(12, 00, 00)
+
 
 
 
@@ -83,7 +86,7 @@ def adlibris(isbn):
     except:
         conn = False
         log("No connection to website. Trying to reconnect in 10 seconds.")
-        leep(10)
+        sleep(10)
 
     try:
 
@@ -248,7 +251,7 @@ def main():
 
             if start < now and now < end:
                 planner()
-                sleep(4000)
+                sleep(4000) #Sleep for over 1 h, so there is just i fetch per day.
 
             else:
                 print('Going to sleep')
