@@ -11,6 +11,7 @@ try:
     import re
     from time import sleep
     from bs4 import BeautifulSoup as BS
+    import xlrd
 except ImportError:
     import urllib2
 
@@ -23,16 +24,39 @@ file = open('isbn.txt', 'r')
 
 ISBNList = []  # Should be kept global so we don't get alot of calls, saves memory
 
+# Read list of ISBN for books to compare
 for line in file:
     ISBNList.append(line)
 file.close()
+
+# Create map of Cremona prices paired with ISBN
+workbook = xlrd.open_workbook('indata/Prislista_svensk.xls')
+sheet_names = workbook.sheet_names()
+sheet = workbook.sheet_by_name(sheet_names[0])
+CremonaPriceList = []
+for row_idx in range(10, sheet.nrows):
+        isbnCell = sheet.cell(row_idx,0)
+        priceCell = sheet.cell(row_idx,2)
+        row = []
+        row.append(isbnCell)
+        row.append(priceCell)
+        CremonaPriceList.append(row)
+workbook = xlrd.open_workbook('indata/Prislista_utlandsk.xls')
+sheet_names = workbook.sheet_names()
+sheet = workbook.sheet_by_name(sheet_names[0])
+for row_idx in range(10, sheet.nrows):
+        isbnCell = sheet.cell(row_idx, 0)
+        priceCell = sheet.cell(row_idx, 2)
+        row = []
+        row.append(isbnCell)
+        row.append(priceCell)
+        CremonaPriceList.append(row)
 
 if outputFormat == 'db':
     passFile = open('passwd.txt', 'r')
 
     password = passFile.read()
     password = password.replace("\n","")
-
 
 #Defines interval when the fetch should occur.
 start = datetime.time(11, 00, 00)
