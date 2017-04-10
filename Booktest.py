@@ -14,7 +14,7 @@ try:
 except ImportError:
     import urllib2
 
-outputFormat = 'db' # This is the standard mode in production
+outputFormat = 'csv' # This is the standard mode in production
 if len(sys.argv) > 1:
     if str(sys.argv[1]) == 'output=csv':
         outputFormat = 'csv' # This is a debug mode, writing output to local file only once
@@ -61,8 +61,9 @@ def bokus(isbn):
     try:
         soup = BS(html, 'lxml')
 
-        buyValue = soup.find('span', {'class': 'pris big'}).text
-        buyValue = buyValue[:-2]
+        buyValue = soup.find("meta",  itemprop="price")   #Takes the metadata from the bookpage
+        buyValue = buyValue['content']
+        buyValue = buyValue[:-3]
     except:
         buyValue = 'null'
         buyValue = str(buyValue)
@@ -257,8 +258,8 @@ def main():
                 print('Going to sleep')
                 sleep(600)
     elif outputFormat == 'csv':
-        output_file_name = str((datetime.datetime.today()).isoformat()) + '.csv'
-        output_file_path = "local_fetched_data/" # This directory has to exist beforehand
+        output_file_name = str((datetime.date.today()).isoformat()) + '.csv'  #When using datetime.today() it does not work on windows.
+        output_file_path = 'local_fetched_data/' # This directory has to exist beforehand
         fetch_to_file(output_file_path + output_file_name)
 
 
