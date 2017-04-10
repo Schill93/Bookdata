@@ -49,3 +49,5 @@ passwd.txt
 
 # Local output data
 local_fetched_data/*
+
+*.xls
