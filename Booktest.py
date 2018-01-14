@@ -29,28 +29,28 @@ for line in file:
     ISBNList.append(line)
 file.close()
 
-# Create map of Cremona prices paired with ISBN
-workbook = xlrd.open_workbook('indata/Prislista_svensk.xls')
-sheet_names = workbook.sheet_names()
-sheet = workbook.sheet_by_name(sheet_names[0])
-CremonaPriceList = []
-for row_idx in range(10, sheet.nrows):
-        isbnCell = sheet.cell(row_idx,0)
-        priceCell = sheet.cell(row_idx,2)
-        row = []
-        row.append(isbnCell)
-        row.append(priceCell)
-        CremonaPriceList.append(row)
-workbook = xlrd.open_workbook('indata/Prislista_utlandsk.xls')
-sheet_names = workbook.sheet_names()
-sheet = workbook.sheet_by_name(sheet_names[0])
-for row_idx in range(10, sheet.nrows):
-        isbnCell = sheet.cell(row_idx, 0)
-        priceCell = sheet.cell(row_idx, 2)
-        row = []
-        row.append(isbnCell)
-        row.append(priceCell)
-        CremonaPriceList.append(row)
+# # Create map of Cremona prices paired with ISBN
+# workbook = xlrd.open_workbook('indata/Prislista_svensk.xls')
+# sheet_names = workbook.sheet_names()
+# sheet = workbook.sheet_by_name(sheet_names[0])
+# CremonaPriceList = []
+# for row_idx in range(10, sheet.nrows):
+#         isbnCell = sheet.cell(row_idx,0)
+#         priceCell = sheet.cell(row_idx,2)
+#         row = []
+#         row.append(isbnCell)
+#         row.append(priceCell)
+#         CremonaPriceList.append(row)
+# workbook = xlrd.open_workbook('indata/Prislista_utlandsk.xls')
+# sheet_names = workbook.sheet_names()
+# sheet = workbook.sheet_by_name(sheet_names[0])
+# for row_idx in range(10, sheet.nrows):
+#         isbnCell = sheet.cell(row_idx, 0)
+#         priceCell = sheet.cell(row_idx, 2)
+#         row = []
+#         row.append(isbnCell)
+#         row.append(priceCell)
+#         CremonaPriceList.append(row)
 
 if outputFormat == 'db':
     passFile = open('passwd.txt', 'r')
@@ -197,6 +197,28 @@ def cdon(isbn):
 
     return price
 
+def akademibokhandeln(isbn):
+    link = 'https://www.akademibokhandeln.se/sok/?sokfraga='
+
+    response = urllib2.urlopen(link + isbn)
+
+    html = response.read()
+
+    response.close()
+
+    try:
+
+        soup = BS(html, "lxml")
+
+        title = soup.find('span','list-product-price__large').text  # .text gör att den bara returnerar värdet, och inte hela"strängen"
+
+        title = title[:-2]
+
+    except:
+        title = str('null')
+
+    return title
+
 def db_create():
 
     conn = False
@@ -252,9 +274,9 @@ def fetch_to_file(output_file_name):
     rows.append("ISBN,bokus,adlibris,cdon,snaplit\n")
 
     for isbn in ISBNList:
-        row = isbn.rstrip() + "," + bokus(isbn) + "," + adlibris(isbn) + "," + cdon(isbn) + "," + snaplit(isbn) + "\n"
+        row = isbn.rstrip() + "," + bokus(isbn) + "," + adlibris(isbn) + "," + cdon(isbn) + "," + snaplit(isbn) + "," + akademibokhandeln(isbn) + "\n"
         rows.append(row)
-        print("Fetched ", row[:-1])
+        print(row[:-1])
 
     print("Fetched data for " + str(len(rows)-1) + " books")
 
